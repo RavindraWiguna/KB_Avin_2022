@@ -1,4 +1,5 @@
-from collections import Counter #to act like a std::map on cpp
+from collections import Counter
+from turtle import distance #to act like a std::map on cpp
 
 #reference: https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2 08/03/2022
 class PuzzleNode():
@@ -13,6 +14,9 @@ class PuzzleNode():
 
     def __eq__(self, other):
         return self.position == other.position
+
+    def __str__(self):
+        return self.position
 
 #GLOBAL VARIABLE
 GOAL_NODE = None #will be created after readfile
@@ -35,19 +39,38 @@ def readfile(filename):
     # print(data) #is a string
     return data
 
-def get_string_state(game_state):
-    game_string = ""
-    for row in game_state:
-        for i in row:
-            game_string+=str(i)
-    # print(game_string)
-    return game_string
+def get_pos_from_str(string_state):
+    positions = [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        []
+    ]
+    for id, c in enumerate(string_state):
+        c = int(c)
+        row, col = id//3, id%3
+        positions[c].append(row)
+        positions[c].append(col)
+    
+    return positions
+
 
 def get_heuristic_val(game_position):
-    global GOAL_NODE
-    goal_position = GOAL_NODE.position
-    #loop through position
-
+    global GOAL_POS
+    total_distance = 0
+    for id, c in enumerate(game_position):
+        c = int(c)
+        if(c == 0):#skip 0 position
+            continue
+        row, col = id//3, id%3
+        distance = abs(GOAL_POS[c][0] - row) + abs(GOAL_POS[c][1] - col)
+        total_distance += distance
+    return total_distance
 
 def a_star(game_state, zero_id):
     pass
@@ -60,15 +83,20 @@ def check_data(datas):
         print(data)
 
 def main():
-    global GOAL_NODE
+    global GOAL_NODE, GOAL_POS
+    #read the goal and initial state
     init_state = readfile("state.txt")
     goal_state = readfile("goal.txt")
-
+    
+    #create nodes based on those state
     start_node = PuzzleNode(None, init_state)
     GOAL_NODE = PuzzleNode(None, goal_state)
-
-    get_heuristic_val(start_node.position)
     
+    #extract each number row/col position for heuristic
+    GOAL_POS = get_pos_from_str(GOAL_NODE.position)
+
+    h = get_heuristic_val(start_node.position)
+    print(h)
 
 
 
