@@ -1,5 +1,7 @@
 from collections import Counter #to act like a std::map on cpp
-import os
+import os #for debuging (pause on windows)
+import time 
+
 #pseudocode reference: 
 #https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2 08/03/2022
 class PuzzleNode():
@@ -127,13 +129,14 @@ def reconstruct_path(node):
     
     return path[::-1] #return the reversed the path
 
+total_node = 0
 def a_star(start_node):
-    global GOAL_NODE, MOVE_SET
+    global GOAL_NODE, MOVE_SET, total_node
     open_nodes = [] #store node that haven't explored
     closed_state = Counter() #store state that has been explored
     path = None #saved path for return value
     open_nodes.append(start_node) #put start node on the open list
-    
+    total_node+=1
     #loop while open list is not empty in pythonic way
     while open_nodes:
         #get node with min f value
@@ -162,7 +165,7 @@ def a_star(start_node):
             if(closed_state[move_node.state] > 0):
                 continue
             
-            print(f'{move_node.state}')
+            # print(f'{move_node.state}')
             #calculate f value of this node
             move_node.g = min_node.g + 1
             move_node.h = get_heuristic_val(move_node.state)
@@ -178,6 +181,7 @@ def a_star(start_node):
                         break
             
             if(worthyToAdd):
+                total_node +=1
                 open_nodes.append(move_node)
         #End of For Loop
     #End of While Loop
@@ -191,7 +195,7 @@ def check_data(datas):
         print(data)
 
 def main():
-    global GOAL_NODE, GOAL_POS
+    global GOAL_NODE, GOAL_POS, total_node
     #read the goal and initial state
     init_state = readfile("state.txt")
     goal_state = readfile("goal.txt")
@@ -206,10 +210,23 @@ def main():
     GOAL_POS = get_pos_from_state(GOAL_NODE.state)
 
     #search!
+    start_time = time.perf_counter()
     path = a_star(start_node)
+    end_time = time.perf_counter()
+    print(f'A star elapsed times: {end_time - start_time}')
+    print(f'Total closed node inspected: {total_node}')
     print(path)
+    print(f'total move: {len(path)}')
 
 
 
 if __name__ == "__main__":
     main()
+
+#some improvement:
+'''
+1. node aint counting zero everytime?
+2. aint using string?, use array is ok, because 9 integer vs 9 char is kinda the same, but when counting of course using str hmm, so maybe still str
+3. cek validity of 0 movement
+4. shi idk, use more counter?
+'''

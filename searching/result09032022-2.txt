@@ -1,0 +1,6 @@
+724506831
+012345678
+HEY, Found the goal!
+A star elapsed times: 134.6857249
+Total closed node inspected: 76865
+[None, 'd', 'r', 'r', 'u', 'r', 'u', 'l', 'd', 'r', 'u', 'u', 'u', 'l', 'd', 'd', 'r', 'u', 'u', 'r', 'd', 'l', 'd', 'l', 'd', 'r', 'u', 'u', 'r', 'd', 'r', 'r', 'u', 'r', 'r']

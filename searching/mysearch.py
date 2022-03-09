@@ -1,5 +1,5 @@
 from copy import deepcopy
-from msvcrt import getch
+import time
 import os
 
 from cv2 import threshold
@@ -108,10 +108,13 @@ def dfs(game_state, zero_id, depth):
 
 
 bfs_m_visited = {}
+total_visited = 0
 def bfs(game_state, zero_id):
+    global bfs_m_visited, total_visited
     queue = []
     cur_state_str = getStringState(game_state)
     bfs_m_visited[cur_state_str] = 1
+    total_visited+=1
     last_path = ["Root"]
     the_path = []
     saved_state = deepcopy(game_state)
@@ -165,6 +168,7 @@ def bfs(game_state, zero_id):
                 except KeyError:
                     # print(f'{cur_que_str} got added to queue')
                     bfs_m_visited[cur_que_str] = 1
+                    total_visited+=1
                     #add to queue
                     # print(f'add: {type(this_move_path)}')
                     queue.append([cur_que_state, cur_que_zero, this_move_path])
@@ -182,7 +186,7 @@ def readfile(filename):
     f = open(filename)
     data = f.read()
     # Break the string into a list using a space as a seperator.
-    data = data.split(" ")
+    # data = data.split("")
     state = [[], [], []]
     cur_row = 0
     cur_data = 0
@@ -208,13 +212,18 @@ def main():
     # print(zero_id)
     # dfs(game_state, zero_id, 0)
     # result = path_dfs
+    start_time = time.perf_counter()
     result = bfs(game_state, zero_id)
+    end_time = time.perf_counter()
+    print(f'BFS elapsed times: {end_time - start_time}')
+    print(f'total node visited = {total_visited}')
     print("we got:")
     if(len(result) > 0):
         print(result)
     else:
         print("nothing")
 
+    print(f'total move: {len(result)}')
     # print(state_is_a_goal(GOAL_STATE))
 
 if __name__ == "__main__":
