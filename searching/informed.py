@@ -212,7 +212,7 @@ def main():
     path = a_star(start_node)
     end_time = time.perf_counter()
     print(f'A star elapsed times: {end_time - start_time}')
-    print(f'Total closed node inspected: {total_node}')
+    print(f'Total node created: {total_node}')
     print(path)
     print(f'total move: {len(path)}')
 
