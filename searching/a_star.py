@@ -1,4 +1,4 @@
-from collections import Counter #to act like a std::map on cpp
+from collections import Counter #to act like a std::map<str, int> on cpp
 from collections import defaultdict #dictionary but with default value on missing key
 from queue import PriorityQueue #to store node with automated queue based on f val
 import os #for debuging (pause on windows)
@@ -7,12 +7,12 @@ import time
 from numpy import Inf 
 
 #pseudocode reference: 
-#Wikipedia: Pseudocode on Astart with some googling of python data structures
+#Wikipedia: Pseudocode on A star with some googling of python data structures
 GROUND = ord("0") #to help convert str to int
 class PuzzleNode():
     """A node class for 8 Puzzle"""
     def __init__(self, state=None, prev_move=None):
-        self.state = state #also a string of 9 char
+        self.state = state #a string of 9 char
         self.prev_move = prev_move #[r, l, d, u] move to get from parrent to this node
         self.g = 0
         self.zero_id = None #location of "0" in the string to fasten look up for moveset
@@ -222,11 +222,3 @@ if __name__ == "__main__":
     # import cProfile
     # cProfile.run('main()')
     main()
-
-#some improvement:
-'''
-1. node aint counting zero everytime?
-2. aint using string?, use array is ok, because 9 integer vs 9 char is kinda the same, but when counting of course using str hmm, so maybe still str
-3. cek validity of 0 movement
-4. shi idk, use more counter?
-'''
