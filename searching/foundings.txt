@@ -1,0 +1,3 @@
+to get int value from a string in python, faster (~2x) ord - ord 0 rather int
+
+comparing string or integer about the same speed (same digit)

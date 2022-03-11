@@ -1,14 +1,17 @@
 from copy import deepcopy
 import time
 import os
+from collections import Counter
 
 from cv2 import threshold
 GOAL_STATE=[[],[],[]]
+GROUND = ord("0")
 def getStringState(game_state):
     game_string = ""
     for row in game_state:
         for i in row:
             game_string+=str(i)
+            # game_string += chr(GROUND+i)
     # print(game_string)
     return game_string
 
@@ -55,9 +58,11 @@ def state_is_a_goal(game_state):
     for row in range(3):
         if(result):
             for col in range(3):
-                if(int(game_state[row][col]) != int(GOAL_STATE[row][col])):
+                if(game_state[row][col] != GOAL_STATE[row][col]):
                     result = False
                     break
+        else:
+            break
     return result
 
 
@@ -107,13 +112,13 @@ def dfs(game_state, zero_id, depth):
     # print(path_dfs)
 
 
-bfs_m_visited = {}
+bfs_m_visited = Counter()
 total_visited = 0
 def bfs(game_state, zero_id):
     global bfs_m_visited, total_visited
     queue = []
     cur_state_str = getStringState(game_state)
-    bfs_m_visited[cur_state_str] = 1
+    bfs_m_visited[cur_state_str]+= 1
     total_visited+=1
     last_path = ["Root"]
     the_path = []
@@ -158,16 +163,9 @@ def bfs(game_state, zero_id):
                 cur_que_state, cur_que_zero = move_state(cur_que_state, move, cur_que_zero)
                 #cek is visited?
                 cur_que_str = getStringState(cur_que_state)
-                try:
-                    if(bfs_m_visited[cur_que_str] == 1):
-                        # visited +=1
-                        # print(f'and visited = {visited}')
-                        pass
-                    else:
-                        print("should not be here")
-                except KeyError:
+                if(bfs_m_visited[cur_que_str] == 0):
                     # print(f'{cur_que_str} got added to queue')
-                    bfs_m_visited[cur_que_str] = 1
+                    bfs_m_visited[cur_que_str] += 1
                     total_visited+=1
                     #add to queue
                     # print(f'add: {type(this_move_path)}')
@@ -193,7 +191,8 @@ def readfile(filename):
     cur_id = 0
     zero_id = 0
     for element in data:
-        if(int(element) == 0):
+        element = ord(element) - GROUND
+        if(element == 0):
             zero_id = cur_id
         state[cur_row].append(element)
         cur_data+=1
@@ -227,4 +226,6 @@ def main():
     # print(state_is_a_goal(GOAL_STATE))
 
 if __name__ == "__main__":
+    # import cProfile
+    # cProfile.run('main()')
     main()

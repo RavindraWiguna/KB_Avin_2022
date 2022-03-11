@@ -1,29 +1,25 @@
 from collections import Counter #to act like a std::map on cpp
 import os #for debuging (pause on windows)
-import time 
+import time
+from copy import deepcopy
 
 #pseudocode reference: 
 #https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2 08/03/2022
-GROUND = ord("0") #to help convert str to int
 class PuzzleNode():
     """A node class for 8 Puzzle"""
-    def __init__(self, parent=None, state=None, prev_move=None):
-        self.parent = parent #a node :D
+    def __init__(self, state=None, path_to_get_here=None, zero_id=None):
+        # self.parent = parent #a node :D
         self.state = state #also a string of 9 char
-        self.prev_move = prev_move #[r, l, d, u] move to get from parrent to this node
+        self.path_to_get_here = path_to_get_here #list of char move to get from root to this node
         self.g = 0 #cost from start node
         self.h = 0 #estimated cost to end node
         self.f = 0 #total cost
-        self.zero_id = None #location of "0" in the string to fasten look up for moveset
-        #search for 0
-        # print(type(self.state))
-        for id, c in enumerate(self.state):
-            c = ord(c) - GROUND
-            if(c == 0):
-                self.zero_id = id
-                # print(f'zero id: {id}')
-                break
-    
+        self.zero_id = zero_id #location of "0" in the string to fasten look up for moveset
+        # #search for 0
+        # # print(type(self.state))
+
+
+
     def __eq__(self, other):
         return self.state == other.state
 
@@ -48,8 +44,13 @@ MOVE_SET = [
 def readfile(filename):
     f = open(filename)
     data = f.read()
-    # print(data) #is a string
-    return data
+    zero_id = 0
+    for id, c in enumerate(data):
+        c = int(c)
+        if(c == 0):
+            zero_id = id
+            break
+    return data, zero_id
 
 def get_pos_from_state(string_state):
     positions = [
@@ -64,7 +65,7 @@ def get_pos_from_state(string_state):
         []
     ]
     for id, c in enumerate(string_state):
-        c = ord(c) - GROUND
+        c = int(c)
         row, col = id//3, id%3
         positions[c].append(row)
         positions[c].append(col)
@@ -75,7 +76,7 @@ def get_heuristic_val(node_state):
     global GOAL_POS
     total_distance = 0
     for id, c in enumerate(node_state):
-        c = ord(c) - GROUND
+        c = int(c)
         if(c == 0):#skip 0 position
             continue
         row, col = id//3, id%3
@@ -89,8 +90,9 @@ def get_min_node(open_list):
     for id, node in enumerate(open_list):
         if(node.f < min_node.f):
             #update the node and id
-            min_node, node_id = node, id
-
+            min_node = node
+            node_id = id
+    
     return min_node, node_id
 
 def create_state(cur_node, move):
@@ -116,7 +118,7 @@ def create_state(cur_node, move):
     state_str = "".join(state_list)
     # print(state_list)
     #return the state
-    return state_str
+    return state_str, num_id
 
 def reconstruct_path(node):
     path = []
@@ -127,14 +129,14 @@ def reconstruct_path(node):
     
     return path[::-1] #return the reversed the path
 
-total_node = 0
+total_node_created = 0
 def a_star(start_node):
-    global GOAL_NODE, MOVE_SET, total_node
+    global GOAL_NODE, MOVE_SET, total_node_created
     open_nodes = [] #store node that haven't explored
     closed_state = Counter() #store state that has been explored
     path = None #saved path for return value
     open_nodes.append(start_node) #put start node on the open list
-    total_node+=1
+    total_node_created+=1
     #loop while open list is not empty in pythonic way
     while open_nodes:
         #get node with min f value
@@ -147,7 +149,9 @@ def a_star(start_node):
         #check if it is the goal node
         if (min_node == GOAL_NODE):
             print("HEY, Found the goal!")
-            path = reconstruct_path(min_node)
+            # path = reconstruct_path(min_node)
+            path = min_node.path_to_get_here
+            path = list(path)
             break
         
         #get all possible move
@@ -155,9 +159,12 @@ def a_star(start_node):
         # print(f'got {len(possible_move)} possible move')
         for move in possible_move:
             #generate node based on move
-            move_state = create_state(min_node, move)
+            move_state, moved_zero = create_state(min_node, move)
             # print(move_state)
-            move_node = PuzzleNode(min_node, move_state, move)
+            #get the path list and append
+            move_path_list = deepcopy(min_node.path_to_get_here)
+            move_path_list.append(move)
+            move_node = PuzzleNode(move_state, move_path_list, moved_zero)
             # os.system("pause")
             #check if this node's state has been reached/visited/closed
             if(closed_state[move_node.state] > 0):
@@ -172,14 +179,14 @@ def a_star(start_node):
             worthyToAdd = True
             #check this node duplicate on open_nodes using linear search
             for node in open_nodes:
-                if(move_node.g > node.g):
-                    if(move_node == node):
+                if(move_node == node):
+                    if(move_node.g > node.g):
                         #same node exist but with lower g cost, so threw this node
                         worthyToAdd = False
                         break
             
             if(worthyToAdd):
-                total_node +=1
+                total_node_created +=1
                 open_nodes.append(move_node)
         #End of For Loop
     #End of While Loop
@@ -193,16 +200,16 @@ def check_data(datas):
         print(data)
 
 def main():
-    global GOAL_NODE, GOAL_POS, total_node
+    global GOAL_NODE, GOAL_POS, total_node_created
     #read the goal and initial state
-    init_state = readfile("state.txt")
-    goal_state = readfile("goal.txt")
+    init_state, init_zero = readfile("state.txt")
+    goal_state, goal_zero = readfile("goal.txt")
     
     print(init_state)
     print(goal_state)
     #create nodes based on those state
-    start_node = PuzzleNode(None, init_state)
-    GOAL_NODE = PuzzleNode(None, goal_state)
+    start_node = PuzzleNode(init_state, ["."], init_zero)
+    GOAL_NODE = PuzzleNode(goal_state, ["."], goal_zero)
     
     #extract each number row/col position for heuristic calculation
     GOAL_POS = get_pos_from_state(GOAL_NODE.state)
@@ -212,15 +219,13 @@ def main():
     path = a_star(start_node)
     end_time = time.perf_counter()
     print(f'A star elapsed times: {end_time - start_time}')
-    print(f'Total closed node inspected: {total_node}')
+    print(f'Total closed node inspected: {total_node_created}')
     print(path)
     print(f'total move: {len(path)}')
 
 
 
 if __name__ == "__main__":
-    # import cProfile
-    # cProfile.run('main()')
     main()
 
 #some improvement:
