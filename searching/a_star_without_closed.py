@@ -1,4 +1,3 @@
-from collections import Counter #to act like a std::map<str, int> on cpp
 from collections import defaultdict #dictionary but with default value on missing key
 from queue import PriorityQueue #to store node with automated queue based on f val
 import os #for debuging (pause on windows)
@@ -132,7 +131,6 @@ def a_star(start_node):
     global GOAL_NODE, MOVE_SET, total_node
     
     open_nodes = PriorityQueue()#store node that haven't explored with pqueue
-    closed_state = Counter() #counter for state that has been explored
     cameFrom = {} #dict to map where a node came from
     
     #node scores
@@ -149,8 +147,6 @@ def a_star(start_node):
     while open_nodes:
         #get node with min f value
         min_node = open_nodes.get()[1]
-        #add min node counter in 
-        closed_state[min_node.state]+=1
         
         #check if it is the goal node
         if (min_node == GOAL_NODE):
@@ -166,12 +162,6 @@ def a_star(start_node):
             move_state = create_state(min_node, move)
             # print(move_state)
             move_node = PuzzleNode(move_state, move)
-            # os.system("pause")
-            #check if this node's state has been reached/visited/closed
-            if(closed_state[move_node.state] > 0):
-                continue
-            
-            # print(f'{move_node.state}')
             #calculate f value of this node
             tentative_gScore = gScore[min_node.state] + 1 #distance of node is same, so always +1
             if(tentative_gScore < gScore[move_node.state]):
@@ -222,3 +212,4 @@ if __name__ == "__main__":
     # import cProfile
     # cProfile.run('main()')
     main()
+    #hm kurang lebih sama?
