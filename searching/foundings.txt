@@ -5,3 +5,5 @@ comparing string or integer about the same speed (same digit)
 about the same too in a = 0, then a+=7, vs a = 0 then a = 7
 
 dict is bit faster by 1 block (a block could be 10* any?)
+
+a star with string is slightly faster than tupple
