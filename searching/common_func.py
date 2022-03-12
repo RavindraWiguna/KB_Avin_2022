@@ -1,5 +1,16 @@
 GROUND = ord("0") #to help convert str to int
 CHANGE_MOVE_ID = {'r': -1, 'l':1, 'u':3, 'd':-3}
+MOVE_SET = (
+('l', 'u'),             #0
+('r', 'l', 'u'),        #1
+('r', 'u'),             #2
+('l', 'd', 'u'),        #3
+('r', 'l', 'd', 'u'),   #4
+('r', 'd', 'u'),        #5
+('l', 'd'),             #6
+('r', 'l', 'd'),        #7
+('r', 'd')              #8
+)
 
 class BaseNode():
     """A base node class for 8 puzzle greedy and a star"""
