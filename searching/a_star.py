@@ -35,19 +35,6 @@ class PuzzleNode():
 #GLOBAL VARIABLE
 GOAL_NODE = None #will be created after readfile
 GOAL_POS = None #hold row, col data for each number in goal
-MOVE_SET = [
-    ['l', 'u'],             #0
-    ['r', 'l', 'u'],        #1
-    ['r', 'u'],             #2
-    ['l', 'd', 'u'],        #3
-    ['r', 'l', 'd', 'u'],   #4
-    ['r', 'd', 'u'],        #5
-    ['l', 'd'],             #6
-    ['r', 'l', 'd'],        #7
-    ['r', 'd']              #8
-]
-INFINITY = float('inf')
-
 
 def readfile(filename):
     f = open(filename)
@@ -124,14 +111,24 @@ def reconstruct_path(node, cameFrom):
 
 total_node = 0
 def a_star(start_node):
-    global GOAL_NODE, MOVE_SET, total_node
-    
+    global GOAL_NODE, total_node
+    MOVE_SET = (
+    ('l', 'u'),             #0
+    ('r', 'l', 'u'),        #1
+    ('r', 'u'),             #2
+    ('l', 'd', 'u'),        #3
+    ('r', 'l', 'd', 'u'),   #4
+    ('r', 'd', 'u'),        #5
+    ('l', 'd'),             #6
+    ('r', 'l', 'd'),        #7
+    ('r', 'd')              #8
+    )
     open_nodes = PriorityQueue()#store node that haven't explored with pqueue
     closed_state = Counter() #counter for state that has been explored
     cameFrom = {} #dict to map where a node came from
     
     #node scores
-    gScore = defaultdict(lambda: INFINITY)
+    gScore = defaultdict(lambda:float('inf'))
     gScore[start_node.state] = 0 #save start node state gscore to 0
     start_node.f = get_heuristic_val(start_node.state) 
     open_nodes.put(start_node)
