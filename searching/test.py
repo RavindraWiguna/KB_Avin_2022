@@ -105,12 +105,12 @@ def ifelseeq():
 
 #=================================================
 start_time = time.perf_counter()
-dicteq()
+ordf()
 end_time = time.perf_counter()
 print(f'elapsed time: {end_time - start_time}')
 
 
 start_time = time.perf_counter()
-ifelseeq()
+intf()
 end_time = time.perf_counter()
 print(f'elapsed time: {end_time - start_time}')
