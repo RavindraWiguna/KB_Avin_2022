@@ -8,17 +8,6 @@ from common_func import *
 #https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
 #https://en.wikipedia.org/wiki/A*_search_algorithm
 def a_star(start_node, goal_node):
-    MOVE_SET = (
-    ('l', 'u'),             #0
-    ('r', 'l', 'u'),        #1
-    ('r', 'u'),             #2
-    ('l', 'd', 'u'),        #3
-    ('r', 'l', 'd', 'u'),   #4
-    ('r', 'd', 'u'),        #5
-    ('l', 'd'),             #6
-    ('r', 'l', 'd'),        #7
-    ('r', 'd')              #8
-    )
     total_opened_node = 0
     #extract each number row/col position for heuristic calculation
     goal_pos = get_pos_from_state(goal_node.state)
