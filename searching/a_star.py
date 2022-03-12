@@ -109,9 +109,8 @@ def reconstruct_path(node, cameFrom):
     path.append(".")#append "."
     return path[::-1] #return the reversed the path
 
-total_node = 0
 def a_star(start_node):
-    global GOAL_NODE, total_node
+    global GOAL_NODE
     MOVE_SET = (
     ('l', 'u'),             #0
     ('r', 'l', 'u'),        #1
@@ -123,6 +122,7 @@ def a_star(start_node):
     ('r', 'l', 'd'),        #7
     ('r', 'd')              #8
     )
+    total_opened_node = 0
     open_nodes = PriorityQueue()#store node that haven't explored with pqueue
     closed_state = Counter() #counter for state that has been explored
     cameFrom = {} #dict to map where a node came from
@@ -132,10 +132,9 @@ def a_star(start_node):
     gScore[start_node.state] = 0 #save start node state gscore to 0
     start_node.f = get_heuristic_val(start_node.state) 
     open_nodes.put(start_node)
-    
+    total_opened_node+=1
     path = None #saved path for return value
-    total_node+=1
-    tentative_gScore = None
+    tentative_gScore = None #variable to hold min node gScore
     #loop while open list is not empty in pythonic way
     while open_nodes:
         #get node with min f value
@@ -171,19 +170,19 @@ def a_star(start_node):
                 move_node.f = tentative_gScore + get_heuristic_val(move_node.state)
                 #check if it is not in the open set
                 if(move_node not in (x for x in open_nodes.queue)):
-                    total_node+=1
+                    total_opened_node+=1
                     open_nodes.put(move_node)
 
         #End of For Loop
     #End of While Loop
-    return path
+    return path, total_opened_node
 
 def check_data(datas):
     for data in datas:
         print(data)
 
 def main():
-    global GOAL_NODE, GOAL_POS, total_node
+    global GOAL_NODE, GOAL_POS
     #read the goal and initial state
     init_state = readfile("state.txt")
     goal_state = readfile("goal.txt")
@@ -199,10 +198,10 @@ def main():
 
     #search!
     start_time = time.perf_counter()
-    path = a_star(start_node)
+    path, total_opened_node = a_star(start_node)
     end_time = time.perf_counter()
     print(f'A star elapsed times: {end_time - start_time}')
-    print(f'Total node opened: {total_node}')
+    print(f'Total node opened: {total_opened_node}')
     print(path)
     print(f'total move: {len(path)}')
 
