@@ -5,7 +5,12 @@ import os #for debuging (pause on windows)
 import time 
 
 #pseudocode reference: 
-#Wikipedia: Pseudocode on A star with some googling of python data structures
+#https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
+#https://en.wikipedia.org/wiki/A*_search_algorithm
+#GLOBAL VARIABLE
+GOAL_NODE = None #will be created after readfile
+GOAL_POS = None #hold row, col data for each number in goal
+CHANGE_MOVE_ID = {'r': -1, 'l':1, 'u':3, 'd':-3}
 GROUND = ord("0") #to help convert str to int
 class PuzzleNode():
     """A node class for 8 Puzzle"""
@@ -29,12 +34,7 @@ class PuzzleNode():
     
     def __gt__(self, other):
         return self.f > other.f
-    
 
-
-#GLOBAL VARIABLE
-GOAL_NODE = None #will be created after readfile
-GOAL_POS = None #hold row, col data for each number in goal
 
 def readfile(filename):
     f = open(filename)
@@ -75,21 +75,9 @@ def get_heuristic_val(node_state):
     return total_distance
 
 def create_state(cur_node, move):
+    global CHANGE_MOVE_ID
     state_list = list(cur_node.state) #because string is immutable
-    num_id = 0 #swapped number index
-    if(move == 'r'):
-        #zero to left
-        num_id = cur_node.zero_id - 1
-    elif (move == 'l'):
-        #zero to right
-        num_id = cur_node.zero_id + 1
-    elif (move == 'u'):
-        #zero to down
-        num_id = cur_node.zero_id + 3
-    else:
-        #zero to up
-        num_id = cur_node.zero_id - 3
-    
+    num_id = cur_node.zero_id + CHANGE_MOVE_ID[move] #swapped number index
     #swap
     state_list[cur_node.zero_id] = state_list[num_id] #set 0 to number
     state_list[num_id] = "0" #set the num to 0
