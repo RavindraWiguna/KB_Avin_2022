@@ -8,17 +8,6 @@ from common_func import *
 #modifitying A star with pseudocode from: https://en.wikipedia.org/wiki/Best-first_search
 
 def greedy_best_first_search(start_node, goal_node):
-    MOVE_SET = (
-    ('l', 'u'),             #0
-    ('r', 'l', 'u'),        #1
-    ('r', 'u'),             #2
-    ('l', 'd', 'u'),        #3
-    ('r', 'l', 'd', 'u'),   #4
-    ('r', 'd', 'u'),        #5
-    ('l', 'd'),             #6
-    ('r', 'l', 'd'),        #7
-    ('r', 'd')              #8
-    )
     total_opened_node = 0
     goal_pos = get_pos_from_state(goal_node.state) #extract each number row/col position for heuristic calculation
     
