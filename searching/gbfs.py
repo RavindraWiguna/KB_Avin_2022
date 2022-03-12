@@ -1,30 +1,25 @@
 from collections import Counter #to act like a std::map<str, int> on cpp
+from copy import deepcopy #dictionary but with default value on missing key
 from queue import PriorityQueue #to store node with automated queue based on f val
 import os #for debuging (pause on windows)
-from copy import deepcopy
-import time
-
-from numpy import Inf 
+import time 
 
 #pseudocode reference: 
-#Wikipedia: Pseudocode on A star with some googling of python data structures, but modified f(n) instead of g(n)+h(n) become only h(n)
+#https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
+#https://en.wikipedia.org/wiki/A*_search_algorithm
+#GLOBAL VARIABLE
+GOAL_NODE = None #will be created after readfile
+GOAL_POS = None #hold row, col data for each number in goal
+CHANGE_MOVE_ID = {'r': -1, 'l':1, 'u':3, 'd':-3}
 GROUND = ord("0") #to help convert str to int
+
 class PuzzleNode():
     """A node class for 8 Puzzle"""
-    def __init__(self, state=None, paths=None):
+    def __init__(self, state=None, path=None, zero_id=None):
         self.state = state #a string of 9 char
-        self.paths = paths #[r, l, d, u] move to get from parrent to this node
+        self.path = path #path needed to get from parrent to this node
         self.h = 0
-        self.zero_id = None #location of "0" in the string to fasten look up for moveset
-
-        #search for 0
-        # print(type(self.state))
-        for id, c in enumerate(self.state):
-            c = ord(c) - GROUND
-            if(c == 0):
-                self.zero_id = id
-                # print(f'zero id: {id}')
-                break
+        self.zero_id = zero_id #location of "0" in the string to fasten look up for moveset
     
     def __eq__(self, other):
         return self.state == other.state
@@ -32,33 +27,18 @@ class PuzzleNode():
     def __gt__(self, other):
         return self.h > other.h
 
-    def __str__(self):
-        return self.state
-    
-
-
-#GLOBAL VARIABLE
-GOAL_NODE = None #will be created after readfile
-GOAL_POS = None #hold row, col data for each number in goal
-MOVE_SET = [
-    ['l', 'u'],             #0
-    ['r', 'l', 'u'],        #1
-    ['r', 'u'],             #2
-    ['l', 'd', 'u'],        #3
-    ['r', 'l', 'd', 'u'],   #4
-    ['r', 'd', 'u'],        #5
-    ['l', 'd'],             #6
-    ['r', 'l', 'd'],        #7
-    ['r', 'd']              #8
-]
-INFINITY = float('inf')
-
 
 def readfile(filename):
     f = open(filename)
     data = f.read()
     # print(data) #is a string
-    return data
+    zero_id = 0
+    for id, element in enumerate(data):
+        if(element=="0"):
+            zero_id = id
+            break
+    
+    return data, zero_id
 
 def get_pos_from_state(string_state):
     positions = [
@@ -93,21 +73,9 @@ def get_heuristic_val(node_state):
     return total_distance
 
 def create_state(cur_node, move):
+    global CHANGE_MOVE_ID
     state_list = list(cur_node.state) #because string is immutable
-    num_id = 0 #swapped number index
-    if(move == 'r'):
-        #zero to left
-        num_id = cur_node.zero_id - 1
-    elif (move == 'l'):
-        #zero to right
-        num_id = cur_node.zero_id + 1
-    elif (move == 'u'):
-        #zero to down
-        num_id = cur_node.zero_id + 3
-    else:
-        #zero to up
-        num_id = cur_node.zero_id - 3
-    
+    num_id = cur_node.zero_id + CHANGE_MOVE_ID[move] #swapped number index
     #swap
     state_list[cur_node.zero_id] = state_list[num_id] #set 0 to number
     state_list[num_id] = "0" #set the num to 0
@@ -115,86 +83,91 @@ def create_state(cur_node, move):
     state_str = "".join(state_list)
     # print(state_list)
     #return the state
-    return state_str
+    return state_str, num_id
 
-total_node = 0
-def greedy_bestfs(start_node):
-    global GOAL_NODE, MOVE_SET, total_node
-    
-    open_nodes = PriorityQueue()#store node that haven't explored with pqueue
-    closed_state = Counter() #counter for state that has been explored
+def greedy_best_first_search(start_node):
+    global GOAL_NODE
+    MOVE_SET = (
+    ('l', 'u'),             #0
+    ('r', 'l', 'u'),        #1
+    ('r', 'u'),             #2
+    ('l', 'd', 'u'),        #3
+    ('r', 'l', 'd', 'u'),   #4
+    ('r', 'd', 'u'),        #5
+    ('l', 'd'),             #6
+    ('r', 'l', 'd'),        #7
+    ('r', 'd')              #8
+    )
+    total_opened_node = 0
+    queue = PriorityQueue()#store node that haven't explored with pqueue
+    visited = Counter() #counter for state that has been explored
     
     #node scores
-    start_node.h = get_heuristic_val(start_node.state)
-    open_nodes.put(start_node)
-    
+    start_node.h = get_heuristic_val(start_node.state) 
+    queue.put(start_node)
+    total_opened_node+=1
     path = None #saved path for return value
-    total_node+=1
-    isNotFound = True
+    isFound = False
     #loop while open list is not empty in pythonic way
-    while open_nodes and isNotFound:
+    while queue and not isFound:
         #get node with min f value
-        min_node = open_nodes.get()
-        
+        min_node = queue.get()
         #get all possible move
         possible_move = MOVE_SET[min_node.zero_id]
+        # print(f'got {len(possible_move)} possible move')
         for move in possible_move:
             #generate node based on move
-            move_state = create_state(min_node, move)
+            move_state, move_zero = create_state(min_node, move)
+            cur_path = deepcopy(min_node.path)
+            cur_path.append(move)
             # print(move_state)
-            cur_min_path = deepcopy(min_node.paths)
-            cur_min_path.append(move)
-            move_node = PuzzleNode(move_state, cur_min_path)
+            move_node = PuzzleNode(move_state, cur_path, move_zero)
             # os.system("pause")
             #check if this node's state has been reached/visited/closed
-            if(closed_state[move_node.state] > 0):
+            if(visited[move_node.state] > 0):
                 continue
             
             if(move_node == GOAL_NODE):
                 print("HEY, Found the goal!")
-                path = move_node.paths
-                isNotFound = False
+                path = move_node.path
+                isFound = True
                 break
-
-            #this node has not visited add to queue, but first calc the h
-            #add min node counter in 
-            closed_state[move_node.state]+=1
-            move_node.h = get_heuristic_val(move_node.state)
-            open_nodes.put(move_node)
-            total_node+=1
             
+            #this node has not visited so, add to queue, but first calc the h val
+            move_node.h = get_heuristic_val(move_node.state)
+            queue.put(move_node)
+            #mark this node as visited 
+            visited[move_node.state]+=1
+            total_opened_node+=1     
 
         #End of For Loop
     #End of While Loop
-    return path
-
-def check_data(datas):
-    for data in datas:
-        print(data)
+    return path, total_opened_node
 
 def main():
-    global GOAL_NODE, GOAL_POS, total_node
+    global GOAL_NODE, GOAL_POS
     #read the goal and initial state
-    init_state = readfile("state.txt")
-    goal_state = readfile("goal.txt")
+    init_state, init_zero = readfile("state.txt")
+    goal_state, goal_zero = readfile("goal.txt")
     
-    print(init_state)
-    print(goal_state)
+    print(f'INITIAL STATE: {init_state}')
+    print(f'GOAL STATE: {goal_state}')
     #create nodes based on those state
-    start_node = PuzzleNode(init_state, ["."])
-    GOAL_NODE = PuzzleNode(goal_state, ["."])
+    start_node = PuzzleNode(init_state, ["."], init_zero)
+    GOAL_NODE = PuzzleNode(goal_state, ["."], goal_zero)
     
     #extract each number row/col position for heuristic calculation
     GOAL_POS = get_pos_from_state(GOAL_NODE.state)
 
     #search!
     start_time = time.perf_counter()
-    path = greedy_bestfs(start_node)
+    path, total_opened_node = greedy_best_first_search(start_node)
     end_time = time.perf_counter()
     print(f'Greedy Best First Search elapsed times: {end_time - start_time}')
-    print(f'Total node opened: {total_node}')
-    print(path)
-    print(f'total move: {len(path)}')
+    print(f'Total node opened: {total_opened_node}')
+    print(f'Total move: {len(path)}')
+    print(f'Path:\n{path}')
+    
 
 
 

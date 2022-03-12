@@ -12,6 +12,7 @@ GOAL_NODE = None #will be created after readfile
 GOAL_POS = None #hold row, col data for each number in goal
 CHANGE_MOVE_ID = {'r': -1, 'l':1, 'u':3, 'd':-3}
 GROUND = ord("0") #to help convert str to int
+
 class PuzzleNode():
     """A node class for 8 Puzzle"""
     def __init__(self, state=None, prev_move=None, zero_id=None):
@@ -25,7 +26,6 @@ class PuzzleNode():
     
     def __gt__(self, other):
         return self.f > other.f
-
 
 def readfile(filename):
     f = open(filename)
@@ -93,6 +93,22 @@ def reconstruct_path(node, cameFrom):
     
     path.append(".")#append "."
     return path[::-1] #return the reversed the path
+
+def print_state(state, goal):
+    print("====INITIAL STATE==================GOAL STATE=====")
+    print( "+-----+-----+-----+            +-----+-----+-----+")
+    print("|     |     |     |            |     |     |     |")
+    print(f'|  {state[0]}  |  {state[1]}  |  {state[2]}  |            |  {goal[0]}  |  {goal[1]}  |  {goal[2]}  |')
+    print("|     |     |     |            |     |     |     |")
+    print("+-----+-----+-----+            +-----+-----+-----+")
+    print("|     |     |     |            |     |     |     |")
+    print(f'|  {state[3]}  |  {state[4]}  |  {state[5]}  |  INTO ==>  |  {goal[3]}  |  {goal[4]}  |  {goal[5]}  |')
+    print("|     |     |     |            |     |     |     |")
+    print("+-----+-----+-----+            +-----+-----+-----+")    
+    print("|     |     |     |            |     |     |     |")
+    print(f'|  {state[6]}  |  {state[7]}  |  {state[8]}  |            |  {goal[6]}  |  {goal[7]}  |  {goal[8]}  |')
+    print("|     |     |     |            |     |     |     |")
+    print("+-----+-----+-----+            +-----+-----+-----+") 
 
 def a_star(start_node):
     global GOAL_NODE
@@ -168,8 +184,7 @@ def main():
     init_state, init_zero = readfile("state.txt")
     goal_state, goal_zero = readfile("goal.txt")
     
-    print(f'INITIAL STATE: {init_state}')
-    print(f'GOAL STATE: {goal_state}')
+    print_state(init_state, goal_state)
     #create nodes based on those state
     start_node = PuzzleNode(init_state, ".", init_zero)
     GOAL_NODE = PuzzleNode(goal_state, ".", goal_zero)
@@ -178,6 +193,7 @@ def main():
     GOAL_POS = get_pos_from_state(GOAL_NODE.state)
 
     #search!
+    print("Searching the Solution using A* Algorithm...")
     start_time = time.perf_counter()
     path, total_opened_node = a_star(start_node)
     end_time = time.perf_counter()
@@ -185,8 +201,6 @@ def main():
     print(f'Total node opened: {total_opened_node}')
     print(f'Total move: {len(path)}')
     print(f'Path:\n{path}')
-    
-
 
 
 if __name__ == "__main__":
