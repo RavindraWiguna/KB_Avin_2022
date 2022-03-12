@@ -1,5 +1,6 @@
 import time
-TENFIVE = 10**5
+import random
+TENFIVE = 10**4
 
 def ordf():
     ground = ord("0")
@@ -61,7 +62,6 @@ def plusid():
                 tseven += id
                 break
     
-
 def overwriteid():
     temp_arr = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     tseven = 0
@@ -73,14 +73,44 @@ def overwriteid():
                 tseven = id
                 break    
 
-start_time = time.perf_counter()
-plusid()
-end_time = time.perf_counter()
+def dicteq():
+    i = 0
+    move=None
+    change_move_id = {'r': -1, 'l': 1, 'u':3, 'd':-3}
+    id = 5
+    while(i < TENFIVE):
+        i+=1
+        move = random.choice(('l', 'r', 'd', 'u'))
+        id += change_move_id[move]   
 
+def ifelseeq():
+    i = 0
+    move = None
+    id = 5
+    while(i < TENFIVE):
+        i+=1
+        move = random.choice(('l', 'r', 'd', 'u'))
+        if(move == 'r'):
+            #zero to left
+            id = id - 1
+        elif (move == 'l'):
+            #zero to right
+            id = id + 1
+        elif (move == 'u'):
+            #zero to down
+            id = id + 3
+        else:
+            #zero to up
+            id = id - 3     
+
+#=================================================
+start_time = time.perf_counter()
+dicteq()
+end_time = time.perf_counter()
 print(f'elapsed time: {end_time - start_time}')
 
-start_time = time.perf_counter()
-overwriteid()
-end_time = time.perf_counter()
 
+start_time = time.perf_counter()
+ifelseeq()
+end_time = time.perf_counter()
 print(f'elapsed time: {end_time - start_time}')
