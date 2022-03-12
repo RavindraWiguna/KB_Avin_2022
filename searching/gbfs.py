@@ -6,8 +6,7 @@ import time
 from common_func import *
 
 #pseudocode reference: 
-#https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
-#https://en.wikipedia.org/wiki/A*_search_algorithm
+#modifitying A star with pseudocode from: https://en.wikipedia.org/wiki/Best-first_search
 
 def greedy_best_first_search(start_node, goal_node):
     MOVE_SET = (
