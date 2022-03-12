@@ -3,9 +3,10 @@ CHANGE_MOVE_ID = {'r': -1, 'l':1, 'u':3, 'd':-3}
 
 class BaseNode():
     """A base node class for 8 puzzle greedy and a star"""
-    def __init__(self, state=None, zero_id=None):
+    def __init__(self, state=None, prev_move=None, zero_id=None):
         self.state = state #a string of 9 char
         self.zero_id = zero_id #location of zero in the state
+        self.prev_move = prev_move #previous move to get to this node
     
     def __eq__(self, other) -> bool:
         return self.state == other.state
@@ -13,9 +14,8 @@ class BaseNode():
 
 class GreedyNode(BaseNode):
     """Node class for Greedy 8 Puzzle"""
-    def __init__(self, state=None, path=None, zero_id=None):
-        super().__init__(state, zero_id)
-        self.path = path #path needed to get from parrent to this node
+    def __init__(self, state=None, prev_move=None, zero_id=None):
+        super().__init__(state, prev_move, zero_id)
         self.h = 0
     
     def __gt__(self, other):
@@ -24,8 +24,7 @@ class GreedyNode(BaseNode):
 class AStarNode(BaseNode):
     """Node class for A star 8 puzzle"""
     def __init__(self, state=None, prev_move=None, zero_id=None):
-        super().__init__(state, zero_id)
-        self.prev_move = prev_move #previous move to get to this node
+        super().__init__(state, prev_move, zero_id)
         self.f = 0
     
     def __gt__(self, other):
