@@ -95,7 +95,7 @@ def reconstruct_path(node, cameFrom):
     return path[::-1] #return the reversed the path
 
 def print_state(state, goal):
-    print("====INITIAL STATE==================GOAL STATE=====")
+    print("===[INITIAL STATE]================[GOAL STATE]====")
     print( "+-----+-----+-----+            +-----+-----+-----+")
     print("|     |     |     |            |     |     |     |")
     print(f'|  {state[0]}  |  {state[1]}  |  {state[2]}  |            |  {goal[0]}  |  {goal[1]}  |  {goal[2]}  |')
@@ -193,7 +193,7 @@ def main():
     GOAL_POS = get_pos_from_state(GOAL_NODE.state)
 
     #search!
-    print("Searching the Solution using A* Algorithm...")
+    print("Searching Solution using A* Algorithm...")
     start_time = time.perf_counter()
     path, total_opened_node = a_star(start_node)
     end_time = time.perf_counter()
