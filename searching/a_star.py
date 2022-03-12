@@ -2,9 +2,7 @@ from collections import Counter #to act like a std::map<str, int> on cpp
 from collections import defaultdict #dictionary but with default value on missing key
 from queue import PriorityQueue #to store node with automated queue based on f val
 import os #for debuging (pause on windows)
-import time
-
-from numpy import Inf 
+import time 
 
 #pseudocode reference: 
 #Wikipedia: Pseudocode on A star with some googling of python data structures
@@ -14,7 +12,7 @@ class PuzzleNode():
     def __init__(self, state=None, prev_move=None):
         self.state = state #a string of 9 char
         self.prev_move = prev_move #[r, l, d, u] move to get from parrent to this node
-        self.g = 0
+        self.f = 0
         self.zero_id = None #location of "0" in the string to fasten look up for moveset
 
         #search for 0
@@ -30,10 +28,7 @@ class PuzzleNode():
         return self.state == other.state
     
     def __gt__(self, other):
-        return self.g > other.g
-
-    def __str__(self):
-        return self.state
+        return self.f > other.f
     
 
 
@@ -137,10 +132,9 @@ def a_star(start_node):
     
     #node scores
     gScore = defaultdict(lambda: INFINITY)
-    gScore[start_node.state] = 0 #set start node state gscore to 0
-
-    temp_fval = get_heuristic_val(start_node.state)
-    open_nodes.put((temp_fval, start_node))
+    gScore[start_node.state] = 0 #save start node state gscore to 0
+    start_node.f = get_heuristic_val(start_node.state) 
+    open_nodes.put(start_node)
     
     path = None #saved path for return value
     total_node+=1
@@ -148,7 +142,7 @@ def a_star(start_node):
     #loop while open list is not empty in pythonic way
     while open_nodes:
         #get node with min f value
-        min_node = open_nodes.get()[1]
+        min_node = open_nodes.get()
         #add min node counter in 
         closed_state[min_node.state]+=1
         
@@ -177,12 +171,11 @@ def a_star(start_node):
             if(tentative_gScore < gScore[move_node.state]):
                 cameFrom[move_node.state] = min_node
                 gScore[move_node.state] = tentative_gScore
-                move_node.g = tentative_gScore
-                temp_fval = tentative_gScore + get_heuristic_val(move_node.state)
+                move_node.f = tentative_gScore + get_heuristic_val(move_node.state)
                 #check if it is not in the open set
-                if(move_node not in (x[1] for x in open_nodes.queue)):
+                if(move_node not in (x for x in open_nodes.queue)):
                     total_node+=1
-                    open_nodes.put((temp_fval, move_node))
+                    open_nodes.put(move_node)
 
         #End of For Loop
     #End of While Loop
