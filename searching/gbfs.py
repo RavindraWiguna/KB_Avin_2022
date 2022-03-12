@@ -1,5 +1,4 @@
 from collections import Counter #to act like a std::map<str, int> on cpp
-from copy import deepcopy #dictionary but with default value on missing key
 from queue import PriorityQueue #to store node with automated queue based on f val
 import time
 
@@ -25,6 +24,7 @@ def greedy_best_first_search(start_node, goal_node):
     
     queue = PriorityQueue()#store node that haven't explored with pqueue
     visited = Counter() #counter for state that has been explored
+    cameFrom = {}
     
     #node scores
     start_node.h = get_heuristic_val(start_node.state, goal_pos) 
@@ -39,7 +39,7 @@ def greedy_best_first_search(start_node, goal_node):
         
         if(min_node == goal_node):
             print("HEY, Found the goal!")
-            path = min_node.path
+            path = reconstruct_path(min_node, cameFrom)
             isFound = True
             break
 
@@ -48,9 +48,7 @@ def greedy_best_first_search(start_node, goal_node):
         for move in possible_move:
             #generate node based on move
             move_state, move_zero = create_state(min_node, move)
-            cur_path = deepcopy(min_node.path)
-            cur_path.append(move)
-            move_node = GreedyNode(move_state, cur_path, move_zero)
+            move_node = GreedyNode(move_state, move, move_zero)
             
             #check if this node's state has been reached/visited/closed
             if(visited[move_node.state] > 0):
@@ -59,6 +57,7 @@ def greedy_best_first_search(start_node, goal_node):
             #this node has not visited so, add to queue, but first calc the h val
             move_node.h = get_heuristic_val(move_node.state, goal_pos)
             queue.put(move_node)
+            cameFrom[move_node.state] = min_node
             #mark this node as visited 
             visited[move_node.state]+=1
             total_opened_node+=1     
@@ -74,8 +73,8 @@ def main():
     
     print_state(init_state, goal_state)
     #create nodes based on those state
-    start_node = GreedyNode(init_state, ["."], init_zero)
-    goal_node = GreedyNode(goal_state, ["."], goal_zero)
+    start_node = GreedyNode(init_state, ".", init_zero)
+    goal_node = GreedyNode(goal_state, ".", goal_zero)
 
     #search!
     start_time = time.perf_counter()
