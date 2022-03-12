@@ -14,20 +14,11 @@ CHANGE_MOVE_ID = {'r': -1, 'l':1, 'u':3, 'd':-3}
 GROUND = ord("0") #to help convert str to int
 class PuzzleNode():
     """A node class for 8 Puzzle"""
-    def __init__(self, state=None, prev_move=None):
+    def __init__(self, state=None, prev_move=None, zero_id=None):
         self.state = state #a string of 9 char
         self.prev_move = prev_move #[r, l, d, u] move to get from parrent to this node
         self.f = 0
-        self.zero_id = None #location of "0" in the string to fasten look up for moveset
-
-        #search for 0
-        # print(type(self.state))
-        for id, c in enumerate(self.state):
-            c = ord(c) - GROUND
-            if(c == 0):
-                self.zero_id = id
-                # print(f'zero id: {id}')
-                break
+        self.zero_id = zero_id #location of "0" in the string to fasten look up for moveset
     
     def __eq__(self, other):
         return self.state == other.state
@@ -40,7 +31,13 @@ def readfile(filename):
     f = open(filename)
     data = f.read()
     # print(data) #is a string
-    return data
+    zero_id = 0
+    for id, element in enumerate(data):
+        if(element=="0"):
+            zero_id = id
+            break
+    
+    return data, zero_id
 
 def get_pos_from_state(string_state):
     positions = [
@@ -85,7 +82,7 @@ def create_state(cur_node, move):
     state_str = "".join(state_list)
     # print(state_list)
     #return the state
-    return state_str
+    return state_str, num_id
 
 def reconstruct_path(node, cameFrom):
     path = []
@@ -141,9 +138,9 @@ def a_star(start_node):
         # print(f'got {len(possible_move)} possible move')
         for move in possible_move:
             #generate node based on move
-            move_state = create_state(min_node, move)
+            move_state, move_zero = create_state(min_node, move)
             # print(move_state)
-            move_node = PuzzleNode(move_state, move)
+            move_node = PuzzleNode(move_state, move, move_zero)
             # os.system("pause")
             #check if this node's state has been reached/visited/closed
             if(closed_state[move_node.state] > 0):
@@ -165,21 +162,17 @@ def a_star(start_node):
     #End of While Loop
     return path, total_opened_node
 
-def check_data(datas):
-    for data in datas:
-        print(data)
-
 def main():
     global GOAL_NODE, GOAL_POS
     #read the goal and initial state
-    init_state = readfile("state.txt")
-    goal_state = readfile("goal.txt")
+    init_state, init_zero = readfile("state.txt")
+    goal_state, goal_zero = readfile("goal.txt")
     
-    print(init_state)
-    print(goal_state)
+    print(f'INITIAL STATE: {init_state}')
+    print(f'GOAL STATE: {goal_state}')
     #create nodes based on those state
-    start_node = PuzzleNode(init_state, ".")
-    GOAL_NODE = PuzzleNode(goal_state, ".")
+    start_node = PuzzleNode(init_state, ".", init_zero)
+    GOAL_NODE = PuzzleNode(goal_state, ".", goal_zero)
     
     #extract each number row/col position for heuristic calculation
     GOAL_POS = get_pos_from_state(GOAL_NODE.state)
@@ -190,8 +183,9 @@ def main():
     end_time = time.perf_counter()
     print(f'A star elapsed times: {end_time - start_time}')
     print(f'Total node opened: {total_opened_node}')
-    print(path)
-    print(f'total move: {len(path)}')
+    print(f'Total move: {len(path)}')
+    print(f'Path:\n{path}')
+    
 
 
 
