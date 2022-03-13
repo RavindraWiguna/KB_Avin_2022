@@ -23,12 +23,37 @@ def shuffle_node(node: BaseNode, n: int):
     
     return node
 
-
+def dfs_shuffle(init_node: BaseNode, n:int):
+    Stacc = []
+    visited = Counter()
+    Stacc.append((init_node, 0))
+    deep = 0
+    furthest_node = None
+    deepest = -1
+    while Stacc and deep < n:
+        cur_node, deep = Stacc.pop()
+        if(deepest < deep):
+            furthest_node = cur_node
+            deepest = deep
+        if(visited[cur_node.state] == 0):
+            visited[cur_node.state]+=1
+            possible_move = MOVE_SET[cur_node.zero_id]
+            for move in possible_move:
+                move_state, zero_loc = create_state(cur_node, move)
+                move_node = BaseNode(move_state, move, zero_loc)
+                Stacc.append((move_node, deep+1))
+    
+    if(Stacc):
+        print(f'got furthest in stacc: {Stacc[-1][1]}')
+        return Stacc[-1][0]
+    print(f'got furthest ever: {deepest}')
+    return furthest_node
 
 def main():
     goal_state, zero_id = readfile("goal.txt")
     # print_state(goal_state, goal_state)
-    finish_node = shuffle_node(BaseNode(goal_state, ".", zero_id), 69420)
+    # finish_node = shuffle_node(BaseNode(goal_state, ".", zero_id), 69420)
+    finish_node = dfs_shuffle(BaseNode(goal_state, ".", zero_id), 2**17)
     print_state(goal_state, finish_node.state)
     print(finish_node.state)
 
