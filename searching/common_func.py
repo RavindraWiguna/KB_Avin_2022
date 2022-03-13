@@ -35,7 +35,7 @@ class GreedyNode():
     def __eq__(self, other) -> bool:
         return self.state == other.state
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         return self.h > other.h
 
 class AStarNode():
@@ -51,7 +51,7 @@ class AStarNode():
     def __eq__(self, other) -> bool:
         return self.state == other.state
     
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         if(self.f == other.f):
             return self.h > other.h
         return self.f > other.f
@@ -69,7 +69,7 @@ def readfile(filename):
     
     return data, zero_id
 
-def get_pos_from_state(string_state):
+def get_pos_from_state(string_state: str):
     positions = [
         [],
         [],
@@ -89,7 +89,7 @@ def get_pos_from_state(string_state):
     
     return positions
 
-def get_heuristic_val(node_state, GOAL_POS):
+def get_heuristic_val(node_state: str, GOAL_POS: list):
     total_distance = 0
     for id, c in enumerate(node_state):
         c = int(c)
@@ -112,7 +112,7 @@ def create_state(cur_node, move: str):
     #return the state
     return state_str, num_id
 
-def print_state(state, goal):
+def print_state(state: str, goal: str):
     print("===[INITIAL STATE]================[GOAL STATE]====")
     print( "+-----+-----+-----+            +-----+-----+-----+")
     print("|     |     |     |            |     |     |     |")
