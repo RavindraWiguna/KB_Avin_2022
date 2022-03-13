@@ -112,7 +112,7 @@ def create_state(cur_node, move: str):
     #return the state
     return state_str, num_id
 
-def print_state(state: str, goal: str):
+def print_init_goal_state(state: str, goal: str):
     print("===[INITIAL STATE]================[GOAL STATE]====")
     print( "+-----+-----+-----+            +-----+-----+-----+")
     print("|     |     |     |            |     |     |     |")

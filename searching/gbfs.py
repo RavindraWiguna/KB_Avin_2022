@@ -60,7 +60,7 @@ def main():
     init_state, init_zero = readfile("state.txt")
     goal_state, goal_zero = readfile("goal.txt")
     
-    print_state(init_state, goal_state)
+    print_init_goal_state(init_state, goal_state)
     #create nodes based on those state
     start_node = GreedyNode(init_state, ".", init_zero)
     goal_node = GreedyNode(goal_state, ".", goal_zero)
