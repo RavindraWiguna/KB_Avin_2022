@@ -85,7 +85,7 @@ def get_heuristic_val(node_state, GOAL_POS):
         total_distance += distance
     return total_distance
 
-def create_state(cur_node, move):
+def create_state(cur_node: BaseNode, move: str):
     state_list = list(cur_node.state) #because string is immutable
     num_id = cur_node.zero_id + CHANGE_MOVE_ID[move] #swapped number index
     #swap
@@ -113,7 +113,7 @@ def print_state(state, goal):
     print("|     |     |     |            |     |     |     |")
     print("+-----+-----+-----+            +-----+-----+-----+")
 
-def reconstruct_path(min_node, cameFrom):
+def reconstruct_path(min_node: BaseNode, cameFrom: dict):
     path = []
     cur_node = min_node
     while (cur_node.prev_move != "."):
