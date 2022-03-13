@@ -19,7 +19,8 @@ def a_star(start_node, goal_node):
     #node scores
     gScore = defaultdict(lambda:float('inf'))
     gScore[start_node.state] = 0 #save start node state gscore to 0
-    start_node.f = get_heuristic_val(start_node.state, goal_pos) 
+    start_node.h = get_heuristic_val(start_node.state, goal_pos) 
+    start_node.f = start_node.h
     open_nodes.put(start_node)
     total_opened_node+=1
     path = None #saved path for return value
@@ -56,7 +57,8 @@ def a_star(start_node, goal_node):
             if(tentative_gScore < gScore[move_node.state]):
                 cameFrom[move_node.state] = min_node
                 gScore[move_node.state] = tentative_gScore
-                move_node.f = tentative_gScore + get_heuristic_val(move_node.state, goal_pos)
+                move_node.h = get_heuristic_val(move_node.state, goal_pos)
+                move_node.f = tentative_gScore + move_node.h
                 #check if it is not in the open set
                 if(move_node not in (x for x in open_nodes.queue)):
                     total_opened_node+=1
@@ -78,10 +80,10 @@ def main():
     
     #search!
     print("Searching Solution using A* Algorithm...")
-    # start_time = time.perf_counter()
+    start_time = time.perf_counter()
     path, total_opened_node = a_star(start_node, goal_node)
-    # end_time = time.perf_counter()
-    # print(f'A star elapsed times: {end_time - start_time}')
+    end_time = time.perf_counter()
+    print(f'A star elapsed times: {end_time - start_time}')
     print(f'Total node opened: {total_opened_node}')
     print(f'Total move: {len(path)-1} (Without root)')
     print(f'Path:\n{path}')
