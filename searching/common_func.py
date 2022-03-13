@@ -22,14 +22,13 @@ MOVE_SET = (
 #     def __eq__(self, other) -> bool:
 #         return self.state == other.state
 
-
+#separated because greater is diff
 class GreedyNode():
     """Node class for Greedy 8 Puzzle"""
-    def __init__(self, state=None, prev_move=None, zero_id=None):
+    def __init__(self, state=None, zero_id=None):
         # super().__init__(state, prev_move, zero_id)
         self.state = state #a string of 9 char
         self.zero_id = zero_id #location of zero in the state
-        self.prev_move = prev_move #previous move to get to this node
         self.h = 0
     
     def __eq__(self, other) -> bool:
@@ -38,13 +37,13 @@ class GreedyNode():
     def __gt__(self, other) -> bool:
         return self.h > other.h
 
+#no inheritance cause faster
 class AStarNode():
     """Node class for A star 8 puzzle"""
-    def __init__(self, state=None, prev_move=None, zero_id=None):
+    def __init__(self, state=None, zero_id=None):
         # super().__init__(state, prev_move, zero_id)
         self.state = state #a string of 9 char
         self.zero_id = zero_id #location of zero in the state
-        self.prev_move = prev_move #previous move to get to this node
         self.f = 0
         self.h = 0 #somehow if a star has .h itself, the a star run a bit faster (~0.2x+ vs 0.38+x ) huh, so it is a common issue where inheritin kinda make it slower
     
@@ -128,11 +127,50 @@ def print_init_goal_state(state: str, goal: str):
     print("|     |     |     |            |     |     |     |")
     print("+-----+-----+-----+            +-----+-----+-----+")
 
-def reconstruct_path(min_node, cameFrom: dict):
+def print_state(state: str, move: str, n: int):
+    print(f'MOVE #{n}:[{move}]')
+    print( "+-----+-----+-----+")
+    print("|     |     |     |")
+    print(f'|  {state[0]}  |  {state[1]}  |  {state[2]}  |')
+    print("|     |     |     |")
+    print("+-----+-----+-----+")
+    print("|     |     |     |")
+    print(f'|  {state[3]}  |  {state[4]}  |  {state[5]}  |')
+    print("|     |     |     |")
+    print("+-----+-----+-----+")    
+    print("|     |     |     |")
+    print(f'|  {state[6]}  |  {state[7]}  |  {state[8]}  |')
+    print("|     |     |     |")
+    print("+-----+-----+-----+")    
+
+def simple_make_state(state, zero_id, move):
+    state_list = list(state) #because string is immutable
+    num_id = zero_id + CHANGE_MOVE_ID[move] #swapped number index
+    #swap
+    state_list[zero_id] = state_list[num_id] #set 0 to number
+    state_list[num_id] = "0" #set the num to 0
+
+    state_str = "".join(state_list)
+    # print(state_list)
+    #return the state
+    return state_str, num_id    
+
+
+def reconstruct_path(finish_state, cameFrom: dict):
     path = []
-    cur_node = min_node
-    while (cur_node.prev_move != "."):
-        path.append(cur_node.prev_move)
-        cur_node = cameFrom[cur_node.state]
-    path.append("Root") #finally add the root
+    cur_state = finish_state
+    while (cur_state):
+        cur_state, move = cameFrom[cur_state]
+        path.append(move)
     return path[::-1] #reverse the path, and return it
+
+def print_history(init_state, zero_id, path):
+    cur_state = init_state
+    #cut from id 1-end
+    for i, move in enumerate(path[1:]):
+        cur_state, zero_id = simple_make_state(cur_state, zero_id, move)
+        print_state(cur_state, move, i+1)
+
+# def prev_move_valid(parrent_node, child_node):
+#     print(f'{parrent_node.state} and move: {child_node.prev_move} become: {child_node.state}')
+#     return child_node.prev_move in MOVE_SET[parrent_node.zero_id]
