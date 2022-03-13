@@ -66,10 +66,11 @@ def main():
     goal_node = GreedyNode(goal_state, ".", goal_zero)
 
     #search!
-    start_time = time.perf_counter()
+    print("Searching Solution using Greedy Best First Search Algorithm...")
+    # start_time = time.perf_counter()
     path, total_opened_node = greedy_best_first_search(start_node, goal_node)
-    end_time = time.perf_counter()
-    print(f'Greedy Best First Search elapsed times: {end_time - start_time}')
+    # end_time = time.perf_counter()
+    # print(f'Greedy Best First Search elapsed times: {end_time - start_time}')
     print(f'Total node opened: {total_opened_node}')
     print(f'Total move: {len(path)-1} (Without root)')
     print(f'Path:\n{path}')
