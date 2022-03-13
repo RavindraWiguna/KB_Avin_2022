@@ -116,8 +116,9 @@ def print_state(state, goal):
 def reconstruct_path(min_node, cameFrom):
     path = []
     cur_node = min_node
-    while (cur_node.prev_move != "."):
+    valid_move = ('l', 'r', 'd','u')
+    while (cur_node.prev_move in valid_move):
         path.append(cur_node.prev_move)
         cur_node = cameFrom[cur_node.state]
-    path.append(".") #finally add the root
+    path.append("Root") #finally add the root
     return path[::-1] #reverse the path, and return it

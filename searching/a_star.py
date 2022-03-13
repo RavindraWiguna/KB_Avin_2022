@@ -83,7 +83,7 @@ def main():
     end_time = time.perf_counter()
     print(f'A star elapsed times: {end_time - start_time}')
     print(f'Total node opened: {total_opened_node}')
-    print(f'Total move: {len(path)}')
+    print(f'Total move: {len(path)-1} (Without root)')
     print(f'Path:\n{path}')
 
 
