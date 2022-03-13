@@ -60,7 +60,7 @@ def a_star(start_node, goal_node):
                 move_node.h = get_heuristic_val(move_node.state, goal_pos)
                 move_node.f = tentative_gScore + move_node.h
                 #check if it is not in the open set
-                if(move_node not in (x for x in open_nodes.queue)):
+                if(move_node not in open_nodes.queue):
                     total_opened_node+=1
                     open_nodes.put(move_node)
 
