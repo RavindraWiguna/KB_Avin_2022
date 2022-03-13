@@ -37,7 +37,7 @@ class AStarNode(BaseNode):
     def __init__(self, state=None, prev_move=None, zero_id=None):
         super().__init__(state, prev_move, zero_id)
         self.f = 0
-        self.h = 0 #somehow if a star has .h itself, the a star run a bit faster (~0.2x+ vs 0.38+x )
+        self.h = 0 #somehow if a star has .h itself, the a star run a bit faster (~0.2x+ vs 0.38+x ) huh, so it is a common issue where inheritin kinda make it slower
     
     def __gt__(self, other):
         if(self.f == other.f):
