@@ -21,7 +21,9 @@ def a_star(start_node, goal_node):
     gScore[start_node.state] = 0 #save start node state gscore to 0
     start_node.h = get_heuristic_val(start_node.state, goal_pos) 
     start_node.f = start_node.h
+    
     open_nodes.put(start_node)
+    cameFrom[start_node.state] = (None, ".")
     total_opened_node+=1
     path = None #saved path for return value
     tentative_gScore = None #variable to hold min node gScore
@@ -35,7 +37,7 @@ def a_star(start_node, goal_node):
         #check if it is the goal node
         if (min_node == goal_node):
             print("HEY, Found the goal!")
-            path = reconstruct_path(min_node, cameFrom)
+            path = reconstruct_path(min_node.state, cameFrom)
             break
         
         #get all possible move
@@ -45,20 +47,22 @@ def a_star(start_node, goal_node):
             #generate node based on move
             move_state, move_zero = create_state(min_node, move)
             # print(move_state)
-            move_node = AStarNode(move_state, move, move_zero)
+            move_node = AStarNode(move_state, move_zero)
             # os.system("pause")
             #check if this node's state has been reached/visited/closed
             if(closed_state[move_node.state] > 0):
                 continue
-            
-            # print(f'{move_node.state}')
-            #calculate f value of this node
+           
+            #this node havent yet visited
             tentative_gScore = gScore[min_node.state] + 1 #distance of node is same, so always +1
             if(tentative_gScore < gScore[move_node.state]):
-                cameFrom[move_node.state] = min_node
+                #Found a smaller g score of this state, so update the g score and cameFrom
+                cameFrom[move_node.state] = (min_node.state, move)
                 gScore[move_node.state] = tentative_gScore
+                #calculate other value of this node
                 move_node.h = get_heuristic_val(move_node.state, goal_pos)
                 move_node.f = tentative_gScore + move_node.h
+                
                 #check if it is not in the open set
                 if(move_node not in open_nodes.queue):
                     total_opened_node+=1
@@ -75,18 +79,24 @@ def main():
     
     print_init_goal_state(init_state, goal_state)
     #create nodes based on those state
-    start_node = AStarNode(init_state, ".", init_zero)
-    goal_node = AStarNode(goal_state, ".", goal_zero)
+    start_node = AStarNode(init_state, init_zero)
+    goal_node = AStarNode(goal_state, goal_zero)
     
     #search!
     print("Searching Solution using A* Algorithm...")
     start_time = time.perf_counter()
     path, total_opened_node = a_star(start_node, goal_node)
     end_time = time.perf_counter()
-    print(f'A star elapsed times: {end_time - start_time}')
+    print(f'A star elapsed time: {end_time - start_time}| [Elapsed time may not be stable, try run it a couple of times to get the elapsed time on average]')
     print(f'Total node opened: {total_opened_node}')
     print(f'Total move: {len(path)-1} (Without root)')
     print(f'Path:\n{path}')
+    ans = input("Do you want to see the solutions in play? [y/n] Default:y\n>>>")
+    if(ans == 'n' or ans == 'N'):
+        print("Alright then, closing program...")
+        return 0
+    
+    print_history(init_state, init_zero,path)
 
 
 if __name__ == "__main__":
