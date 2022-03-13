@@ -11,33 +11,45 @@ MOVE_SET = (
 ('r', 'l', 'd'),        #7
 ('r', 'd')              #8
 )
+# #middle initialy used as base class, but then, faster without inheritance
+# class BaseNode():
+#     """A base node class for 8 puzzle greedy and a star"""
+#     def __init__(self, state=None, prev_move=None, zero_id=None):
+#         self.state = state #a string of 9 char
+#         self.zero_id = zero_id #location of zero in the state
+#         self.prev_move = prev_move #previous move to get to this node
+    
+#     def __eq__(self, other) -> bool:
+#         return self.state == other.state
 
-class BaseNode():
-    """A base node class for 8 puzzle greedy and a star"""
+
+class GreedyNode():
+    """Node class for Greedy 8 Puzzle"""
     def __init__(self, state=None, prev_move=None, zero_id=None):
+        # super().__init__(state, prev_move, zero_id)
         self.state = state #a string of 9 char
         self.zero_id = zero_id #location of zero in the state
         self.prev_move = prev_move #previous move to get to this node
+        self.h = 0
     
     def __eq__(self, other) -> bool:
         return self.state == other.state
 
-
-class GreedyNode(BaseNode):
-    """Node class for Greedy 8 Puzzle"""
-    def __init__(self, state=None, prev_move=None, zero_id=None):
-        super().__init__(state, prev_move, zero_id)
-        self.h = 0
-    
     def __gt__(self, other):
         return self.h > other.h
 
-class AStarNode(BaseNode):
+class AStarNode():
     """Node class for A star 8 puzzle"""
     def __init__(self, state=None, prev_move=None, zero_id=None):
-        super().__init__(state, prev_move, zero_id)
+        # super().__init__(state, prev_move, zero_id)
+        self.state = state #a string of 9 char
+        self.zero_id = zero_id #location of zero in the state
+        self.prev_move = prev_move #previous move to get to this node
         self.f = 0
         self.h = 0 #somehow if a star has .h itself, the a star run a bit faster (~0.2x+ vs 0.38+x ) huh, so it is a common issue where inheritin kinda make it slower
+    
+    def __eq__(self, other) -> bool:
+        return self.state == other.state
     
     def __gt__(self, other):
         if(self.f == other.f):
@@ -88,7 +100,7 @@ def get_heuristic_val(node_state, GOAL_POS):
         total_distance += distance
     return total_distance
 
-def create_state(cur_node: BaseNode, move: str):
+def create_state(cur_node, move: str):
     state_list = list(cur_node.state) #because string is immutable
     num_id = cur_node.zero_id + CHANGE_MOVE_ID[move] #swapped number index
     #swap
@@ -116,7 +128,7 @@ def print_state(state, goal):
     print("|     |     |     |            |     |     |     |")
     print("+-----+-----+-----+            +-----+-----+-----+")
 
-def reconstruct_path(min_node: BaseNode, cameFrom: dict):
+def reconstruct_path(min_node, cameFrom: dict):
     path = []
     cur_node = min_node
     while (cur_node.prev_move != "."):
