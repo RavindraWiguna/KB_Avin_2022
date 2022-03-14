@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from collections import Counter #to act like a std::map<str, int> on cpp
 from collections import defaultdict #dictionary but with default value on missing key
 from queue import PriorityQueue #to store node with automated queue based on f val
