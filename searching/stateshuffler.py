@@ -1,4 +1,4 @@
-from common_func import readfile, print_state, create_state, MOVE_SET, AStarNode
+from common_func import print_init_goal_state, readfile, print_state, create_state, MOVE_SET, AStarNode
 from collections import Counter
 import random as rd
 
@@ -40,7 +40,7 @@ def dfs_shuffle(init_node, n:int):
             possible_move = MOVE_SET[cur_node.zero_id]
             for move in possible_move:
                 move_state, zero_loc = create_state(cur_node, move)
-                move_node = AStarNode(move_state, move, zero_loc)
+                move_node = AStarNode(move_state, zero_loc)
                 Stacc.append((move_node, deep+1))
     
     if(Stacc):
@@ -53,8 +53,8 @@ def main():
     goal_state, zero_id = readfile("goal.txt")
     # print_state(goal_state, goal_state)
     # finish_node = shuffle_node(BaseNode(goal_state, ".", zero_id), 69420)
-    finish_node = dfs_shuffle(AStarNode(goal_state, ".", zero_id), 2**18)
-    print_state(goal_state, finish_node.state)
+    finish_node = dfs_shuffle(AStarNode(goal_state, zero_id), 1000)
+    print_init_goal_state(goal_state, finish_node.state)
     print(finish_node.state)
 
 
