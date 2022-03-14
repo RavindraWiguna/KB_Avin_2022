@@ -14,6 +14,7 @@ def a_star(start_node, goal_node):
     
     open_nodes = PriorityQueue()#store node that haven't explored with pqueue
     closed_state = Counter() #counter for state that has been explored
+    everInOpen = Counter()
     cameFrom = {} #dict to map where a node came from
     
     #node scores
@@ -23,6 +24,7 @@ def a_star(start_node, goal_node):
     start_node.f = start_node.h
     
     open_nodes.put(start_node)
+    everInOpen[start_node.state]+=1
     cameFrom[start_node.state] = (None, ".")
     total_opened_node+=1
     path = None #saved path for return value
@@ -64,9 +66,14 @@ def a_star(start_node, goal_node):
                 move_node.f = tentative_gScore + move_node.h
                 
                 #check if it is not in the open set
-                if(move_node not in open_nodes.queue):
+                if(everInOpen[move_node.state]==0):
+                    #never in open
                     total_opened_node+=1
                     open_nodes.put(move_node)
+                    everInOpen[move_node.state]+=1
+                # if(move_node not in open_nodes.queue):
+                    # total_opened_node+=1
+                    # open_nodes.put(move_node)
 
         #End of For Loop
     #End of While Loop
